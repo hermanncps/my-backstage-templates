@@ -1,0 +1,172 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: springboot-template-web-mvc
+  title: Spring Boot Web Api + Data Base
+  description: Create a simple microservice using Spring Boot MVC and Java plus a Data Base of your choice
+  tags:
+    - rodrigo
+    - java
+    - spring
+    - database
+spec:
+  owner: rodrigorc@compasso.com.br
+  type: service
+
+  parameters:
+    - title: Provide some simple information
+      required:
+        - component_id
+        - owner
+        - java_package_name
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:field: EntityNamePicker
+        java_package_name:
+          title: Java Package Name
+          type: string
+          description: Name for the java package. eg (io.backstage.blah)
+        java_version:
+          title: Java Version
+          type: string
+          description: Wich Java version should be used
+          enum:
+            - '8'
+            - '11'
+            - '14'
+            - '17'
+          enumNames:
+            - 'java 8'
+            - 'java 11'
+            - 'java 14'
+            - 'java 17'
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this website is for.
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: Choose DB Configs
+      required:
+        - database_name
+      properties:
+        db_vendor:
+          title: Data Base Vendor
+          type: string
+          description: Wich Data Base you wish to use
+          enum:
+            - 'mysql'
+            - 'postgresql'
+            - 'mongodb'
+            - 'hsql'            
+          enumNames:
+            - 'MySQL vX.Y.Z'
+            - 'Postgres SQL vX.Y.Z'
+            - 'Mongo DB'
+            - 'HSQL'
+        database_host:
+          title: Data Base Host Location
+          type: string
+        database_name:
+          title: Data Base Name
+          type: string
+        database_port:
+          title: Data Base Port
+          type: string
+        database_username:
+          title: Username
+          type: string
+        database_user_password:
+          title: Password
+          type: string
+    - title: Create/Append To File
+      properties:
+        path:
+          title: Path
+          type: string
+          description: The path to the file
+        content:
+          title: Text area input
+          type: string
+          description: Add your new file content
+          ui:widget: textarea
+          ui:options:
+            rows: 10
+          # ui:help: 'Make sure it is valid by checking the schema at `/tools/entity-preview`'
+          ui:placeholder: |
+            ---
+            Insert content here
+    - title: Choose Repository location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - bitbucket.org 
+  steps:
+    - id: template
+      name: Fetch Skeleton + Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        copyWithoutRender:
+          - .github/workflows/*
+        values:
+          component_id: ${{ parameters.component_id }}
+          description: ${{ parameters.description }}
+          artifact_id: ${{ parameters.component_id }}
+          java_package_name: ${{ parameters.java_package_name }}
+          java_version: ${{ parameters.java_version }}
+          owner: ${{ parameters.owner }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+          database_host: ${{ parameters.database_host }}
+          database_name: ${{ parameters.database_name }}
+          database_port: ${{ parameters.database_port }}
+          database_username: ${{ parameters.database_username }}
+          database_user_password: ${{ parameters.database_user_password }}
+          http_port: 8080
+          db_vendor: ${{ parameters.db_vendor }}
+    - id: appendFile
+      name: Append To File
+      action: roadiehq-ext:utils:fs:append
+      input:
+        path: ${{ parameters.path }}
+        content: '${{ parameters.content }}'
+        values:
+          java_package_name: ${{ parameters.java_package_name }}
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repoUrl }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
