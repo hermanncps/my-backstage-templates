@@ -4,12 +4,7 @@ metadata:
   name: rodrigo-templates
   description: A collection of Backstage example templates from Rodrigo
 spec:
-  type: url
   targets:
-    - https://github.com/hermanncps/my-backstage-templates/blob/main/my-spring-template-v1/template.yaml
-    - https://github.com/hermanncps/my-backstage-templates/blob/main/my-spring-template-addfile-v2/template.yaml
-    - 
-    - ./my-spring-template-addfile-v1/template.yaml
     - ./my-spring-template-addfile-v2/template.yaml
     - ./my-spring-template-v1/template.yaml
-    - ./plugin-template-v1/template.yaml
+    - ./plugin-template-backend/template.yaml
