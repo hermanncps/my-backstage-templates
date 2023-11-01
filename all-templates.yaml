@@ -8,3 +8,4 @@ spec:
     - ./my-spring-template-addfile-v2/template.yaml
     - ./my-spring-template-v1/template.yaml
     - ./plugin-template-backend/template.yaml
+    - ./spring-webmvc-template/template.yaml

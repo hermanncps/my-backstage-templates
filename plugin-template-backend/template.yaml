@@ -2,8 +2,8 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: plugin-template-backend
-  title: Template for a Backend Plugin
-  description: Create an empty Plugin template
+  title: Simple Backend Plugin
+  description: Create an empty Backend Plugin template
   tags:
     - recommended
     - plugin

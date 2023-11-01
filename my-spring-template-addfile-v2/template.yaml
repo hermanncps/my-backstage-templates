@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: create-replace-file-pr
-  title: Template addfiles v2 - Create/Replace Files and makes PR 
+  title: Create/Replace Files in existent repo
   description: Template for create or replace a file or conent in a created repository
   tags:
     - rodrigo
